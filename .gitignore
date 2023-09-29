@@ -1,0 +1,2 @@
+# Excludes all files containing test in its name, in all folders and subfolders
+**/*test*
