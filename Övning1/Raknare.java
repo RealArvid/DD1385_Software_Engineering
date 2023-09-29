@@ -5,7 +5,7 @@ import java.awt.event.*;
 public class Raknare extends JFrame implements ActionListener{
     Display disp;
     ButtonSet buttons;
-    String shown = "0";
+    String showing = "0";
     double dispValue, memmory;
     char operator=0;
     
@@ -22,7 +22,7 @@ public class Raknare extends JFrame implements ActionListener{
     }
     
     public static void main(String[] args){
-        Raknare mainWindow = new Raknare();
+        new Raknare(); // Raknare mainWindow = new Raknare();
     }
     public void actionPerformed(ActionEvent ae){
         String button = ae.getActionCommand();
@@ -30,22 +30,22 @@ public class Raknare extends JFrame implements ActionListener{
         int num = button.charAt(0) - '0';
         System.out.println(button);
         if (num < 10 && num > -1){
-            if(!shown.equals("0")){
-                shown += button;
-                disp.setText(shown);
+            if(!showing.equals("0")){
+                showing += button;
+                disp.setText(showing);
             }
             else{
-                shown = button;
+                showing = button;
             }
         }
         else if(sign=='+'){
             if(memmory == 0){
-                memmory=Integer.parseInt(shown);
+                memmory=Integer.parseInt(showing);
                 operator = sign;
-                shown = "0";
+                showing = "0";
             }
             else{
-                memmory += Integer.parseInt(shown);
+                memmory += Integer.parseInt(showing);
                 operator = sign;
                 disp.setText(""+memmory);
             }
