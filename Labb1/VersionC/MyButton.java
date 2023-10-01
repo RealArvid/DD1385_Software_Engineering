@@ -1,18 +1,20 @@
+package VersionC;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 public class MyButton extends JButton{
+    Ear ear;
     private Color myRed = new Color(150, 0, 0);
     private Color myGreen = new Color(0, 150, 0);
 
-    MyButton(ActionListener masterListener, String buttonText){
+    MyButton(String buttonText){
         this.setText(buttonText);
         this.setFocusable(false);
         this.setFont(new Font("Comic Sans", Font.BOLD, 25));
         this.setForeground(Color.BLACK);
         this.setBackground(myRed);
-        this.addActionListener(masterListener);
+        this.ear = new Ear(this);
     }
 
     public void toggleState(){
@@ -26,6 +28,5 @@ public class MyButton extends JButton{
             this.setText(oldText.replaceAll("On", "Off"));
             this.setBackground(myRed);
         }
-        
     }
 }

@@ -1,9 +1,9 @@
+package VersionC;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class MyFrame extends JFrame implements ActionListener{
+public class MyFrame extends JFrame{
     MyButton button;
     MyButton button2;
     
@@ -15,20 +15,14 @@ public class MyFrame extends JFrame implements ActionListener{
         this.setLayout(null);
         
         
-        button = new MyButton(this, "Off");
+        button = new MyButton("Off");
         button.setBounds(100, 100, 100, 100);
         this.add(button);
 
-        button2 = new MyButton(this, "Off (BIG)");
+        button2 = new MyButton("Off (BIG)");
         button2.setBounds(300, 50, 200, 200);
         this.add(button2);
 
         this.setVisible(true);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        MyButton pressedButton = (MyButton) e.getSource();
-        pressedButton.toggleState();
     }
 }
