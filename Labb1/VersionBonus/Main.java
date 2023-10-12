@@ -51,7 +51,7 @@ public class Main {
             {"Not Clicked", "Clicked"},
             {"Not Clicked", "Clicked"},
             {"Not Clicked", "Clicked"},
-            {"Not Clicked", "Clicked"}
+            {"Not Clicked", "Clicked"},
         };
         
         new MyFrame(buttonTexts);

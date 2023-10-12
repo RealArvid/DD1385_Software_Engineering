@@ -17,7 +17,7 @@ public class MyButton extends JButton implements ActionListener{
         this.addActionListener(this);
     }
 
-    public void toggleState(){
+    private void toggleState(){
         String oldText = this.getText();
         System.out.println(oldText);
         if(this.getBackground() == myRed){

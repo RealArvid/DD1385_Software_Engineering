@@ -4,7 +4,6 @@ import javax.swing.*;
 
 public class ButtonPanel extends JPanel{
     public ButtonPanel(ActionListener masterListener){
-        //setSize(300,400);
         setLayout(new GridLayout(4,4));
         String order = "798+456-123*0./=";
         for(int i = 0; i < order.length(); i++){
