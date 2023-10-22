@@ -1,13 +1,13 @@
 import javax.swing.JFrame;
-
-import java.awt.*;
 import java.awt.event.*;
+import java.awt.*;
 
-public class ViewControl extends JFrame implements ActionListener {
+public class ViewControl extends JFrame implements ActionListener, Runnable {
     private FifteenModel game;
-    private int gridSize;
     private SquarePanel squarePanel;
     private MessageField messageField;
+    private int gridSize;
+    Thread activity;
 
     ViewControl(FifteenModel game){
         this.game = game;
@@ -28,17 +28,28 @@ public class ViewControl extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Square pressedSquare = (Square) e.getSource();
         String old_text = pressedSquare.getText();
-        game.move(pressedSquare.r, pressedSquare.c);
-        if(game.getMessage() != "Could not make the requested move"){
-            squarePanel.board[game.replacedRow][game.replacedCol].setText(old_text); // The text of the neighboring, previously empty square, is set to the text of pressed square
+        int oldZeroRow = game.zero_r;
+        int oldZeroCol = game.zero_c;
+        boolean moveSuccess = game.move(pressedSquare.r, pressedSquare.c);
+        if(moveSuccess){
+            squarePanel.board[oldZeroRow][oldZeroCol].setText(old_text); // The text of the neighboring, previously empty square, is set to the text of pressed square
             pressedSquare.setText(""); // The text of the pressed square is set to ""
         }
-        messageField.setText(game.getMessage());
+        messageField.setText("");
+        activity = new Thread(this);
+		activity.start();
     }
 
-    public static void main(String[] args){
-        int gridSize = 2;
-        FifteenModel game = new FifteenModel(gridSize);
-        new ViewControl(game);
+    @Override
+    public void run() {
+        try {
+            Thread.sleep(50);
+        }
+        catch(InterruptedException e) {
+            ;
+        }
+        finally{
+            messageField.setText(game.getMessage());
+        }
     }
 }

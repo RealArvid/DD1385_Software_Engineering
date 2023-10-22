@@ -1,6 +1,7 @@
 public class TicTacToe implements Boardgame{
     char[][] board;
     int gridSize;
+    private String message = "Game to be started";
 
     TicTacToe(int gridSize){
         this.gridSize = gridSize;
@@ -21,7 +22,7 @@ public class TicTacToe implements Boardgame{
     }
 
     public String getMessage(){
-        return "Mock message";
+        return message;
     }
 
 }

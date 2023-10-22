@@ -6,25 +6,24 @@ class Active extends Thread{
     int n;
 
     Active(String t,int p){
-	text=t;
-	pause=p;
-	start();
+		text=t;
+		pause=p;
+		start();
     }
 
     public void run(){
-	while(n<10){
-	    
-	    try{
-		System.out.println("nu kommer jag sova för 1 sekund");
-		Thread.sleep(pause*1000);
-	    }
-	    catch(InterruptedException ie){
-		System.err.println("fel"+" "+ie);
-	    }
-	    System.out.println(text+" "+n);
-	    n++;
-	}
-	System.out.println(text+"finished");
+		while(n<10){
+			try{
+				System.out.println("Nu kommer jag sova i 1 sekund");
+				Thread.sleep(pause*1000);
+			}
+			catch(InterruptedException ie){
+				System.err.println("fel"+" "+ie);
+			}
+			System.out.println(text+" "+n);
+			n++;
+		}
+		System.out.println(text+" finished");
     }
 }
 
@@ -35,19 +34,19 @@ class Active2 extends Thread{
     int pause;
 
     Active2(String t,int p){
-	text=t;
-	pause=p;
-	start();
+		text=t;
+		pause=p;
+		start();
     }
 
     public void run(){
 	while(keepRunning){
 	    try{
-		Thread.sleep(pause*1000);
+			Thread.sleep(pause*1000);
 	    }
 	    catch(InterruptedException ie){
-		System.out.println("fel"+ie);
-		keepRunning = false;
+			System.out.println("fel"+ie);
+			keepRunning = false;
 	    }
 	    System.out.println(text);
 	}
@@ -64,35 +63,31 @@ class Active3 implements Runnable{
     Thread activity;
 
     Active3(String t,int p){
-	text=t;
-	pause=p;
-	activity = new Thread(this);
-	activity.start();
-	
+		text=t;
+		pause=p;
+		activity = new Thread(this);
+		activity.start();
     }
 
     public void run(){
-	n=0;
-	while(keepRunning){
-
-	    try{
-		Thread.sleep(pause*1000);
-	    }
-	    catch(InterruptedException ie){
-		System.out.println("fel"+ie);
-		keepRunning = false;
-	    }
-	    System.out.println(text+":"+n);
-	    n++;
-	}
-	System.out.println(text+"finished");
+		n=0;
+		while(keepRunning){
+			try{
+				Thread.sleep(pause*1000);
+			}
+			catch(InterruptedException ie){
+				System.out.println("fel"+ie);
+				keepRunning = false;
+			}
+			System.out.println(text+":"+n);
+			n++;
+		}
+		System.out.println(text+"finished");
     }
-
     public void interrupt(){
-	System.out.println("122");
-	activity.interrupt();
+		System.out.println("122");
+		activity.interrupt();
     }
-    
 }
 
 
@@ -102,9 +97,10 @@ class Main{
 		System.out.println("Nu skapas trådarna.");
 		Active a1 = new Active("Thread1",1);
 		Active a2 = new Active("Thread2",2);
-		sc.nextInt();
+		sc.nextLine();
 		a1.interrupt();
-		sc.nextInt();
+		sc.nextLine();
 		a2.interrupt();
+		sc.close();
     }
 }

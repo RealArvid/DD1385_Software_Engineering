@@ -1,58 +1,70 @@
-import java.util.ArrayList;
-import java.util.stream.IntStream;
-import java.util.Random;
+import java.util.*;
 
 public class FifteenModel implements Boardgame{
+    private Random rand = new Random();
+    private String message;
+    private ArrayList<int[]> availableMoves = new ArrayList<int[]>();
+    /**Keeps track of the number of moves made during a game*/
+    private int numMoves;
     int[][] board;
     int gridSize;
-    /**Row index of square previously containing the number zero and which is assigned the number of the pressed square*/
-    int replacedRow;
-    /**Column index of square previously containing the number zero and which is assigned the number of the pressed square*/
-    int replacedCol;
-    private Random rand = new Random();
-    private String message = "Game to be started";
+    /**Row index of the zero square*/
+    int zero_r; 
+    /**Column index of the zero square*/
+    int zero_c;
+
     
     /**Fills the board[][] with numbers 0 to gridSize^2 - 1*/
     FifteenModel(int gridSize){
         this.gridSize = gridSize;
         board = new int[gridSize][gridSize];
-        ArrayList<Integer> intList = new ArrayList<>(IntStream.range(0, gridSize*gridSize).boxed().toList());
-        int numElementsLeft = intList.size();
-        for(int r = 0; r < gridSize; r++){
+        int i = 1;
+        for(int r = 0; r < gridSize; r++){ // Numbers are initially placed in order 1 to gridSize^2
             for(int c = 0; c < gridSize; c++){
-                int randIdx = rand.nextInt(numElementsLeft);
-                board[r][c] = intList.remove(randIdx);
-                numElementsLeft--;
+                board[r][c] = i;
+                i++;
             }
         }
+        board[gridSize - 1][gridSize - 1] = 0; // The last number, gridSize^2, is converted to a zero, so that there are gridSize^2 - 1 positive numbers
+        zero_r = gridSize - 1;
+        zero_c = gridSize - 1;
+        updateAvailableMoves(zero_r, zero_c); // This initializes the availableMoves ArrayList<int[]>
+
+        for(int x = 0; x < 100*gridSize*gridSize; x++){ // The numbers are shuffled around
+            int randIdx = rand.nextInt(availableMoves.size());
+            int[] rc = availableMoves.get(randIdx);
+            move(rc[0], rc[1]);            
+        }
+        numMoves = 0;
+        message = "Game to be started";
     }
 
     @Override
     public boolean move(int r, int c) {
-        int[][] neighbors = {{r,c-1}, {r,c+1}, {r-1 ,c}, {r+1,c}}; // The row and column coordinates of all squares neighboring the pressed square
-        for(int[] rc : neighbors){
-            int new_r = rc[0];
-            int new_c = rc[1];
-            if(new_r >= 0 && new_r < gridSize && new_c >= 0 && new_c < gridSize){ // Checking so that the neighboring squares are within the limits of the grid
-                if(board[new_r][new_c] == 0){ // board[new_r][new_c] == 0 represents the empty square
-                    board[new_r][new_c] = board[r][c]; // The value of the empty square is set to the value of the pressed square
-                    replacedRow = new_r; //
-                    replacedCol = new_c;                    
+        if(message == "Congratulations, you won!"){ // Ensures no moves can be made after the game has been won
+            return false; 
+        }
+        else{
+            numMoves++;
+            for(int[] rc : availableMoves){
+                if(r == rc[0] && c == rc[1]){ // Checking so that the pressed square is among the available moves
+                    board[zero_r][zero_c] = board[r][c]; // The value of the empty square is set to the value of the pressed square
                     board[r][c] = 0;
-                    
+                    zero_r = r;
+                    zero_c = c;                
+                    updateAvailableMoves(zero_r, zero_c);
                     if(hasWon()){
-                        message = "Congratulations, you won!";
+                        message = "Congratulations, you won! (total moves = " + numMoves + ")";
                     }
                     else{
-                        message = "Move made successfully!";
+                        message = "Move made successfully! (total moves = " + numMoves + ")";
                     }
-                    
                     return true;
                 }
             }
+            message = "Could not make the requested move (total moves = " + numMoves + ")";
+            return false;            
         }
-        message = "Could not make the requested move";
-        return false;
     }
 
 
@@ -84,5 +96,19 @@ public class FifteenModel implements Boardgame{
             }
         }
         return true;
+    }
+
+    /**Private method for updating the availableMoves ArrayList<int[]>
+    @param r Row coordinate for the zero square
+    @param c Column coordinate for the zero square*/
+    private void updateAvailableMoves(int r, int c){
+        availableMoves.clear();
+        int[][] possibleNeighbors = {{r,c-1}, {r,c+1}, {r-1,c}, {r+1,c}}; // Some of these coordinates may fall outside the range of the grid
+        for(int[] rc : possibleNeighbors){
+            if(rc[0] >= 0 && rc[0] < gridSize && rc[1] >= 0 && rc[1] < gridSize){ // Checks which squares are within the limits of the grid
+                    int[] availableMove = {rc[0], rc[1]};
+                    availableMoves.add(availableMove);
+            }
+        }
     }
 }

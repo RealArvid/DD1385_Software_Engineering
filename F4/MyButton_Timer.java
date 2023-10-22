@@ -6,31 +6,26 @@ class MyButton extends JButton implements ActionListener{
     int i;
 
     MyButton(){
-	super("Klicka här");
-	i=0;
-	setSize(50,50);
-	addActionListener(this);
-
+		super("Klicka här");
+		i=0;
+		addActionListener(this);
     }
 
     
     public void actionPerformed(ActionEvent ae){
-	i+=1;
-	setText(""+i);
-	
+		i+=1;
+		setText(""+i);
     }
 
 
     public static void main(String[] args){
-
-	JFrame f=new JFrame();
-	f.setSize(50,50);
-	MyButton mb=new MyButton();
-	Timer t=new Timer(3000, mb);
-	t.start();
-	f.add(mb);
-	f.setVisible(true);
+		JFrame f=new JFrame();
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		f.setSize(200,200);
+		MyButton mb=new MyButton();
+		Timer t=new Timer(3000, mb);
+		t.start();
+		f.add(mb);
+		f.setVisible(true);
     }
 }
-
-
