@@ -3,13 +3,19 @@ import java.util.*;
 public class FifteenModel implements Boardgame{
     private Random rand = new Random();
     private String message;
+
+    /**An ArrayList of arrays [row, column] representing the coordinates of squares neighboring the zero square*/
     private ArrayList<int[]> availableMoves = new ArrayList<int[]>();
-    /**Keeps track of the number of moves made during a game*/
+    
+    /**Keeps track of the total number of moves during a game*/
     private int numMoves;
+    private boolean hasWon = false;
     int[][] board;
     int gridSize;
+    
     /**Row index of the zero square*/
-    int zero_r; 
+    int zero_r;
+
     /**Column index of the zero square*/
     int zero_c;
 
@@ -18,7 +24,7 @@ public class FifteenModel implements Boardgame{
     FifteenModel(int gridSize){
         this.gridSize = gridSize;
         board = new int[gridSize][gridSize];
-        int i = 1;
+        int i = 1; // Importantly, i needs to start at 1 (not 0) to ensure that the game can be won (i.e. that the squares can be ordered correctly)
         for(int r = 0; r < gridSize; r++){ // Numbers are initially placed in order 1 to gridSize^2
             for(int c = 0; c < gridSize; c++){
                 board[r][c] = i;
@@ -30,18 +36,27 @@ public class FifteenModel implements Boardgame{
         zero_c = gridSize - 1;
         updateAvailableMoves(zero_r, zero_c); // This initializes the availableMoves ArrayList<int[]>
 
-        for(int x = 0; x < 100*gridSize*gridSize; x++){ // The numbers are shuffled around
+        for(int x = 0; x < 100*gridSize*gridSize; x++){ // Numbers are shuffled around
             int randIdx = rand.nextInt(availableMoves.size());
             int[] rc = availableMoves.get(randIdx);
-            move(rc[0], rc[1]);            
+            move(rc[0], rc[1]);
+            
+            // Overrrides the value of hasWon set by the method hasWon(). This enures that numbers continue to be shuffled around,
+            // even if numbers at some point (by chance) are ordered 1 to gridSize - 1
+            hasWon = false;
         }
+        // These two variables have to be reset as they are updated by the move method in the loop above
         numMoves = 0;
         message = "Game to be started";
     }
 
+    FifteenModel(){ // Default constructor
+        this(4);
+    }
+
     @Override
     public boolean move(int r, int c) {
-        if(message == "Congratulations, you won!"){ // Ensures no moves can be made after the game has been won
+        if(hasWon){ // Enforces that no moves can be made after the game has been won
             return false; 
         }
         else{
@@ -63,7 +78,7 @@ public class FifteenModel implements Boardgame{
                 }
             }
             message = "Could not make the requested move (total moves = " + numMoves + ")";
-            return false;            
+            return false;
         }
     }
 
@@ -95,6 +110,7 @@ public class FifteenModel implements Boardgame{
                 correctValue++;
             }
         }
+        hasWon = true;
         return true;
     }
 

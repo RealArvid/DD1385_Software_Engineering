@@ -33,30 +33,30 @@ class GameBoard extends JPanel{
 		upper.add(upperMessage);
 		add(upper);
 
+		// Clickable buttons with symbols for rock, paper and scissors
+		for (int i = 0; i<3; i++){
+			buttons[i] = new MyButton();
+			buttons[i].setIcon(icons[i]);
+			buttons[i].setActionCommand(texts[i]);
+			add(buttons[i]);
+			// Store each button in a map with its text as key. Enables us to retrieve the button from a textvalue.
+			map.put(texts[i], buttons[i]);
+		}
+		selectedButton = buttons[0]; // Arbitrary value at start
+
 		// Lower JPanel has messages about the game and score
 		JPanel lower = new JPanel();
 		lower.setBackground(bgColor);
 		lower.setLayout(new GridLayout(2,1));
 		lowerMessage = new MyLabel("win/lose/draw");
 		scoreLabel = new MyLabel("Score: 0");
-		lower.add(lowerMessage); lower.add(scoreLabel);
-
-		for (int i = 0; i<3; i++){
-			buttons[i] = new MyButton();
-			buttons[i].setIcon(icons[i]);
-			buttons[i].setActionCommand(texts[i]);
-			add(buttons[i]);
-			// Store each button in a map with its text as key.
-			// Enables us to retrieve the button from a textvalue.
-			map.put(texts[i], buttons[i]);
-		}
-		
-		selectedButton = buttons[0]; // Arbitrary value at start
+		lower.add(lowerMessage);
+		lower.add(scoreLabel);
 		add(lower);
     }
 
 
-    /**Contructor for players board. Adds listener to buttons*/
+    /**Contructor for player board. Adds listeners to buttons*/
     GameBoard(String name, ActionListener listener) {
 		this(name); // Calls other constructor to build the board
 		for(int i = 0; i < 3; i++)

@@ -3,8 +3,8 @@ class CommandLineInterface {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int gridSize = 4;
-        //Boardgame game = new FifteenModel(gridSize);
-        Boardgame game = new TicTacToe(gridSize);
+        Boardgame game = new FifteenModel(gridSize);
+        //Boardgame game = new TicTacToe(gridSize);
         System.out.println("\nWelcome to fifteen puzzle\n");
         while (true) {
             // Print the current board

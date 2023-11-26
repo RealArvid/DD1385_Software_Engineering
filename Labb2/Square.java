@@ -5,7 +5,7 @@ import javax.swing.JButton;
 
 public class Square extends JButton{
     int r; //Row position in the grid
-    int c; //Row position in the grid
+    int c; //Column position in the grid
     
     Square(ActionListener listener, String buttonText, int r, int c){
         this.r = r;

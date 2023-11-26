@@ -3,7 +3,6 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
-// import java.util.concurrent.TimeUnit;
 
 public class RockPaperScissors implements ActionListener{
     private int counter = 0;
@@ -35,7 +34,6 @@ public class RockPaperScissors implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        new ButtonAction(e).start();
         counter++;
         if(counter == 1){
             computerBoard.resetColor();
@@ -51,7 +49,7 @@ public class RockPaperScissors implements ActionListener{
             computerBoard.setLowerMessage("Two");
             myBoard.setLowerMessage("Two");
         }
-        else{ // counter == 3
+        else{ // else if(counter == 3)
             try{
                 String myGesture = e.getActionCommand();
                 myBoard.markPlayed(myGesture);
@@ -80,16 +78,12 @@ public class RockPaperScissors implements ActionListener{
                     myBoard.wins();
                 }
                 
-                // TimeUnit.MILLISECONDS.sleep(1000);
+                //Thread.sleep(1000);
                 counter = 0;
             }
-            catch(IOException ioe){
-                System.out.println(ioe);
+            catch(Exception exception){
+                System.out.println(exception);
             }
-            // catch(InterruptedException ie){
-            //     System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXX");
-            //     System.out.println(ie);
-            // }
         }
     }
 
