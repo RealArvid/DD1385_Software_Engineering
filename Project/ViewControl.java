@@ -20,7 +20,7 @@ public class ViewControl extends JFrame implements PropertyChangeListener{
         gameArea = new GameArea(game.board, squareSize, game.getTetrisCoordinates(), game.getTetrisColor());
         initControls();
 
-        sidePanel = new SidePanel(250, squareSize*game.numRows);
+        sidePanel = new SidePanel(squareSize*5, squareSize*game.numRows, squareSize, game.getNextTetrisBlock());
         add(gameArea);
         add(sidePanel);
         
@@ -79,19 +79,20 @@ public class ViewControl extends JFrame implements PropertyChangeListener{
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if("moveEvent".equals(evt.getPropertyName())){
-            gameArea.repaintTetris((Color) evt.getNewValue());
+        if("Move or rotation".equals(evt.getPropertyName())){
+            gameArea.repaintTetris(game.getTetrisCoordinates(), game.getTetrisColor());
         }
-        else if("combinedEvent".equals(evt.getPropertyName())){
-            gameArea.repaintAll((Color) evt.getNewValue());
+        else if("Update everything".equals(evt.getPropertyName())){
+            gameArea.repaintAll(game.getTetrisCoordinates(), game.getTetrisColor());
         }
-        else if("deleteRow".equals(evt.getPropertyName())){
+        else if("Row deleted".equals(evt.getPropertyName())){
             sidePanel.linesLabel.resetText("Lines: " + (int) evt.getNewValue());
         }
-        else if("newBlock".equals(evt.getPropertyName())){
+        else if("Update score and block preview".equals(evt.getPropertyName())){
             sidePanel.scoreLabel.resetText("Score: " + (int) evt.getNewValue());
+            sidePanel.repaintTetris(game.getNextTetrisBlock());
         }
-        else if("LevelUp".equals(evt.getPropertyName())){
+        else if("Update level".equals(evt.getPropertyName())){
             sidePanel.levelLabel.resetText("Level: " + (int) evt.getNewValue());
         }
     }

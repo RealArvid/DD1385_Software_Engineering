@@ -10,6 +10,7 @@ public class Tetris extends Thread{
     final int numRows;
     final int numColumns;
     private TetrisBlock block;
+    private TetrisBlock nextBlock;
     private boolean gameOn = true;
     private Coordinate startCoordinate;
     private final Object lock = new Object();
@@ -35,7 +36,8 @@ public class Tetris extends Thread{
             }
         }
         startCoordinate = new Coordinate(0, numColumns/2);
-        block = new TetrisBlock(startCoordinate, board);
+        block = new TetrisBlock(startCoordinate);
+        nextBlock = new TetrisBlock(startCoordinate);
     }
 
     public void run(){
@@ -67,41 +69,41 @@ public class Tetris extends Thread{
         return block.color;
     }
 
-    public boolean rotate(){
-        boolean rotated = block.rotate();
-        if(rotated){
-            propertyChangeSupport.firePropertyChange("moveEvent", null, block.color);
+    public TetrisBlock getNextTetrisBlock(){
+        return nextBlock;
+    }
+
+    private boolean blockAction(ArrayList<Coordinate> method){
+        if(gameOn){  // Makes sure user cannot invoke methods from ViewControll after game has finished
+            if(checkAvailability(method)){
+                propertyChangeSupport.firePropertyChange("Move or rotation", null, null);
+                return true;
+            }
+            block.undo();    
         }
-        return rotated;
+        return false; 
+    }
+
+    public boolean rotate(){
+        return blockAction(block.rotate());
     }
 
     public boolean moveLeft(){
-        boolean moved = block.move(0, -1);
-        if(moved){
-            propertyChangeSupport.firePropertyChange("moveEvent", null, block.color);
-        }
-        return moved;
+        return blockAction(block.move(0, -1));
     }
 
     public boolean moveRight(){
-        boolean moved = block.move(0, 1);
-        if(moved){
-            propertyChangeSupport.firePropertyChange("moveEvent", null, block.color);
-        }
-        return moved;
+        return blockAction(block.move(0, 1));
     }
 
     public boolean moveDown(){
-        boolean moved = block.move(1, 0);
-        if(moved){
-            propertyChangeSupport.firePropertyChange("moveEvent", null, block.color);
-        }
-        else if(!moved && gameOn){ // gameOn condition is necessary because otherwise a new block would be spawned when called from the ViewControl class
+        boolean moved = blockAction(block.move(1, 0));
+        if(!moved && gameOn){ // gameOn condition is necessary because otherwise a new block would always be spawned
             solidifyBlock();
             checkRows();
             spawnNewBlock();
             checkGame();
-            propertyChangeSupport.firePropertyChange("combinedEvent", null, block.color);
+            propertyChangeSupport.firePropertyChange("Update everything", null, null);
         }
         return moved;
     }
@@ -125,11 +127,11 @@ public class Tetris extends Thread{
             if(completeRow){
                 deleteRow(row);
                 clearedLines += 1;
-                propertyChangeSupport.firePropertyChange("deleteRow", null, clearedLines);
+                propertyChangeSupport.firePropertyChange("Row deleted", null, clearedLines);
                 if(sleepDurationMap.containsKey(clearedLines)){
                     sleepDuration = sleepDurationMap.get(clearedLines);
                     level += 1;
-                    propertyChangeSupport.firePropertyChange("LevelUp", null, level);
+                    propertyChangeSupport.firePropertyChange("Update level", null, level);
                 }
                 row--; // If a row is deleted, meaning that the row above is shifted down, row-- ensures that the row that's shifted down is also checked
             }
@@ -148,12 +150,13 @@ public class Tetris extends Thread{
     }
 
     private void spawnNewBlock(){
-        score += block.coordinates.size()*level; // += 4*level
-        propertyChangeSupport.firePropertyChange("newBlock", null, score);
-        block.reset(startCoordinate, board);
+        score += block.coordinates.size()*level; // Same as: score += 4*level
+        block = nextBlock;
+        nextBlock = new TetrisBlock(startCoordinate);
+        propertyChangeSupport.firePropertyChange("Update score and block preview", null, score);
     }
 
-    private void checkGame() {
+    private void checkGame(){
         for(Coordinate c: block.coordinates){
             if(board[c.row+1][c.column] != Color.BLACK){
                 System.out.println("Game Over!");
@@ -161,6 +164,23 @@ public class Tetris extends Thread{
                 break;
             }
         }
+    }
+
+    private boolean checkAvailability(ArrayList<Coordinate> coordinates){
+        for(Coordinate c: coordinates){
+            int row = c.row;
+            int col = c.column;
+            if(row < 0 || row >= numRows){
+                return false;
+            }
+            if(col < 0 || col >= numColumns){
+                return false;
+            }
+            if(board[row][col] != Color.BLACK){
+                return false;
+            }            
+        }
+        return true;
     }
 
     public void updateSleepEndTime(){

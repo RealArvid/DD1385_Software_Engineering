@@ -3,15 +3,14 @@ import java.util.*;
 
 public class TetrisBlock {
     ArrayList<Coordinate> coordinates;
+    private ArrayList<Coordinate> oldCoordinates;
     Color color;
-    private Color[][] board;
+    private int oldRotationState;
     private int rotationState;
     private Random random = new Random();
-    /**A an array of array, where each subarray consists of the relative coordinates of a rotation state.
-    That the coordinates are relative means that the first coordinate is (0, 0) and that the indicies of the other coordinates are relative to this.*/
+    /**A an array of arrays, where each subarray consists of the relative coordinates of a rotation state.
+    The coordinates are relative to first coordinate "0, 0" which stays the same for all rotation states*/
     private Coordinate[][] relativeCoordinates;
-    private final int numRows;
-    private final int numCols;
     private static ArrayList<TetrisTemplate> tetrisTemplates = new ArrayList<>(Arrays.asList(
         new TetrisTemplate("I", Color.CYAN,                 new String[] {"0, 0, 0,-2, 0,-1, 0, 1", "0, 0, 1, 0,-1, 0,-2, 0"}),
         new TetrisTemplate("J", Color.BLUE,                 new String[] {"0, 0, 0,-1, 0, 1, 1, 1", "0, 0,-1, 0, 1, 0, 1,-1", "0, 0, 0,-1, 0, 1, -1, -1", "0, 0,-1, 0, 1, 0,-1, 1"}),
@@ -22,10 +21,7 @@ public class TetrisBlock {
         new TetrisTemplate("Z", Color.RED,                  new String[] {"0, 0, 0,-1, 1, 0, 1, 1", "0, 0, 0,-1,-1, 0, 1,-1"})
     ));
 
-    TetrisBlock(Coordinate startCoordinate, Color[][] board){
-        this.board = board;
-        this.numRows = board.length;
-        this.numCols = board[0].length;
+    TetrisBlock(Coordinate startCoordinate){
         TetrisTemplate tetrisTemplate = tetrisTemplates.get(random.nextInt(tetrisTemplates.size()));
         this.color = tetrisTemplate.color;
         this.rotationState = 0;
@@ -36,61 +32,65 @@ public class TetrisBlock {
         }
     }
 
-    public void reset(Coordinate startCoordinate, Color[][] board){
-        TetrisTemplate tetrisTemplate = tetrisTemplates.get(random.nextInt(tetrisTemplates.size()));
-        color = tetrisTemplate.color;
-        rotationState = 0;
-        relativeCoordinates = tetrisTemplate.relativeCoordinates;
-        coordinates.clear();
-        for(Coordinate c: tetrisTemplate.relativeCoordinates[0]){
-            coordinates.add(startCoordinate.add(c));
-        }
-    }
-
-    public boolean move(int delta_row, int delta_column){
-        for(Coordinate c : coordinates){
-            int newRow = c.row + delta_row;
-            int newCol = c.column + delta_column;
-            if(!checkAvailability(newRow, newCol)){
-                return false;
-            }
-        }
+    public ArrayList<Coordinate> move(int delta_row, int delta_column){
+        oldCoordinates = Coordinate.deepCopy(coordinates);
         for(Coordinate c: coordinates){
             c.row += delta_row;
             c.column += delta_column;
-            }
-        return true;
+        }
+        return coordinates;
     }
 
-    public boolean rotate(){
-        int newRotationState = (rotationState+1) % relativeCoordinates.length; // rotationState is incremented by 1 or set to 0 the the old rotationState refers to the last element in relativeCoordinates
-        ArrayList<Coordinate> oldCoordinates = Coordinate.deepCopy(coordinates);
-        for(int i = 0; i < relativeCoordinates[newRotationState].length; i++){
-            coordinates.set(i, oldCoordinates.get(0).add(relativeCoordinates[newRotationState][i]));
+    public ArrayList<Coordinate> rotate(){
+        oldCoordinates = Coordinate.deepCopy(coordinates);
+        oldRotationState = rotationState;
+        rotationState = (rotationState+1) % relativeCoordinates.length; // rotationState is incremented by 1 or set to 0 the the old rotationState refers to the last element in relativeCoordinates
+        coordinates.clear(); // Not necessary if all rotations contain the same number of coordinates
+        for(int i = 0; i < relativeCoordinates[rotationState].length; i++){
+            coordinates.add(oldCoordinates.get(0).add(relativeCoordinates[rotationState][i]));
         }
+        return coordinates;
+    }
+
+    public void undo(){
+        coordinates.clear();
+        for(Coordinate c: oldCoordinates){
+            coordinates.add(c.deepCopy());
+        }
+        rotationState = oldRotationState;
+    }
+
+    public Coordinate[] getRelativeCoordinates(int rotationState){
+        return relativeCoordinates[rotationState];
+    }
+
+    public static int width(Coordinate[] coordinates){
+        if(coordinates.length==0){
+            return 0;
+        }
+        int min = coordinates[0].column;
+        int max = min;
         for(Coordinate c: coordinates){
-            if(!checkAvailability(c.row, c.column)){
-                coordinates.clear();
-                for(Coordinate oldCoordinate: oldCoordinates){
-                    coordinates.add(oldCoordinate);
-                }
-                return false;
+            if(c.column > max){
+                max = c.column;
+            }
+            else if(c.column < min){
+                min = c.column;
             }
         }
-        rotationState = newRotationState;
-        return true;
+        return max-min+1;
     }
 
-    private boolean checkAvailability(int row, int col){
-        if(row < 0 || row >= numRows){
-            return false;
+    public static int min_column(Coordinate[] coordinates){
+        if(coordinates.length==0){
+            return 0;
         }
-        if(col < 0 || col >= numCols){
-            return false;
+        int min = coordinates[0].column;
+        for(Coordinate c: coordinates){
+            if(c.column < min){
+                min = c.column;
+            }
         }
-        if(board[row][col] != Color.BLACK){
-            return false;
-        }
-        return true;
+        return min;
     }
 }
