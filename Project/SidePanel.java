@@ -1,27 +1,22 @@
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.util.ArrayList;
-
+import java.awt.*;
+import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 
 public class SidePanel extends JPanel{
-    MyLabel nextShapeLabel;
-    MyLabel levelLabel;
-    MyLabel linesLabel;
-    MyLabel scoreLabel;
-    final int height;
-    final int width;
-    final int squareSize;
+    MyLabel nextShapeLabel, levelLabel, linesLabel, scoreLabel;
+    private MyButton restartButton;
+    final int height, width, squareSize;
     private Coordinate[] tetrisCoordinates;
+    private int tetrisWidth;
     private Color tetrisColor;
 
 
-    SidePanel(int width, int height, int squareSize, TetrisBlock tetrisBlock){
+    SidePanel(int width, int height, int squareSize, TetrisBlock tetrisBlock, ActionListener listener){
         this.width = width;
         this.height = height;
         this.squareSize = squareSize;
-        tetrisCoordinates = tetrisBlock.getRelativeCoordinates(0);
+        tetrisCoordinates = tetrisBlock.relativeCoordinates[0];
+        tetrisWidth = tetrisBlock.width();
         tetrisColor = tetrisBlock.color;
         setBackground(Color.BLACK);
         setSize(width, height);
@@ -33,22 +28,28 @@ public class SidePanel extends JPanel{
         levelLabel     = new MyLabel("Level: 1", width, squareSize*6);
         linesLabel     = new MyLabel("Lines: 0", width, squareSize*8);
         scoreLabel     = new MyLabel("Score: 0", width, squareSize*10);
+        restartButton  = new MyButton("Restart", 3*squareSize, squareSize, width, height-2*squareSize, listener);
         add(nextShapeLabel);
         add(levelLabel);
         add(linesLabel);
         add(scoreLabel);
+        add(restartButton);
     }
 
+
     public void repaintTetris(TetrisBlock tetrisBlock){
-        tetrisCoordinates = tetrisBlock.getRelativeCoordinates(0);
+        tetrisCoordinates = tetrisBlock.relativeCoordinates[0];
+        tetrisWidth = tetrisBlock.width();
         tetrisColor = tetrisBlock.color;
         repaint();
     }
 
+
     @Override
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
-        int horizontalAdjustment = (width - squareSize*TetrisBlock.width(tetrisCoordinates))/2 - squareSize * TetrisBlock.min_column(tetrisCoordinates);
+        // Painting the preview of the next tetris block
+        int horizontalAdjustment = (width - squareSize*tetrisWidth)/2 - squareSize * leftmost_column(tetrisCoordinates);
         for(Coordinate c: tetrisCoordinates){
             int row = squareSize * (c.row + 2);
             int col = squareSize * c.column + horizontalAdjustment;
@@ -57,7 +58,22 @@ public class SidePanel extends JPanel{
             g.setColor(Color.GRAY); // Border color
             g.drawRect(col, row, squareSize, squareSize);
         }
+        // Painting a white line of width 1 at the leftmost edge of the panel
         g.setColor(Color.WHITE);
         g.fillRect(0,0,1,height);
+    }
+
+
+    private static int leftmost_column(Coordinate[] coordinates){
+        if(coordinates.length==0){
+            return 0;
+        }
+        int min = coordinates[0].column;
+        for(Coordinate c: coordinates){
+            if(c.column < min){
+                min = c.column;
+            }
+        }
+        return min;
     }
 }

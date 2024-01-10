@@ -1,14 +1,18 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.*;
 
-public class ViewControl extends JFrame implements PropertyChangeListener{
+public class ViewControl extends JFrame implements ActionListener, PropertyChangeListener{
     Tetris game;
     GameArea gameArea;
     SidePanel sidePanel;
     int squareSize = 40;
+    private InputMap inputMap;
+    private ActionMap actionMap;
+
 
     ViewControl(Tetris game){      
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -16,21 +20,22 @@ public class ViewControl extends JFrame implements PropertyChangeListener{
         setTitle("Tetris");
         
         this.game = game;
+        this.gameArea = new GameArea(game.board, squareSize, game.block);
+        this.sidePanel = new SidePanel(squareSize*5, squareSize*game.numRows, squareSize, game.nextBlock, this);
         game.addPropertyChangeListener(this);
-        gameArea = new GameArea(game.board, squareSize, game.getTetrisCoordinates(), game.getTetrisColor());
-        initControls();
-
-        sidePanel = new SidePanel(squareSize*5, squareSize*game.numRows, squareSize, game.getNextTetrisBlock());
         add(gameArea);
         add(sidePanel);
-        
         pack();
-        setLocationRelativeTo(null); // Centers window
+
+        initControls();
+        setLocationRelativeTo(null); // Centers window on screen
+        setResizable(false);
         setVisible(true);
     }
 
+
     private void initControls(){
-        InputMap inputMap = getRootPane().getInputMap();
+        inputMap = getRootPane().getInputMap();
         inputMap.put(KeyStroke.getKeyStroke("RIGHT"), "right");
         inputMap.put(KeyStroke.getKeyStroke("LEFT"), "left");
         inputMap.put(KeyStroke.getKeyStroke("UP"), "up");
@@ -38,31 +43,31 @@ public class ViewControl extends JFrame implements PropertyChangeListener{
         inputMap.put(KeyStroke.getKeyStroke("p"), "pause");
         inputMap.put(KeyStroke.getKeyStroke("SPACE"), "pause");
 
-        ActionMap actionMap = getRootPane().getActionMap();
+        actionMap = getRootPane().getActionMap();
         actionMap.put("right", new AbstractAction(){
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e){
                 game.moveRight();
             }
         });
 
         actionMap.put("left", new AbstractAction(){
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e){
                 game.moveLeft();
             }
         });
 
         actionMap.put("up", new AbstractAction(){
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e){
                 game.rotate();
             }
         });
 
         actionMap.put("down", new AbstractAction(){
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e){
                 if(game.moveDown()){
                     game.updateSleepEndTime();
                 }
@@ -71,31 +76,41 @@ public class ViewControl extends JFrame implements PropertyChangeListener{
 
         actionMap.put("pause", new AbstractAction(){
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e){
                 game.pause();
             }
         });
     }
 
+
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if("Move or rotation".equals(evt.getPropertyName())){
-            gameArea.repaintTetris(game.getTetrisCoordinates(), game.getTetrisColor());
-        }
-        else if("Update everything".equals(evt.getPropertyName())){
-            gameArea.repaintAll(game.getTetrisCoordinates(), game.getTetrisColor());
+    public void propertyChange(PropertyChangeEvent evt){
+        if("Repaint".equals(evt.getPropertyName())){
+            gameArea.repaint(game.block);
         }
         else if("Row deleted".equals(evt.getPropertyName())){
-            sidePanel.linesLabel.resetText("Lines: " + (int) evt.getNewValue());
+            sidePanel.linesLabel.setText("Lines: " + (int) evt.getNewValue());
         }
         else if("Update score and block preview".equals(evt.getPropertyName())){
-            sidePanel.scoreLabel.resetText("Score: " + (int) evt.getNewValue());
-            sidePanel.repaintTetris(game.getNextTetrisBlock());
+            sidePanel.scoreLabel.setText("Score: " + (int) evt.getNewValue());
+            sidePanel.repaintTetris(game.nextBlock);
         }
         else if("Update level".equals(evt.getPropertyName())){
-            sidePanel.levelLabel.resetText("Level: " + (int) evt.getNewValue());
+            sidePanel.levelLabel.setText("Level: " + (int) evt.getNewValue());
         }
     }
+
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        game.restart();
+        sidePanel.linesLabel.setText("Lines: 0");
+        sidePanel.scoreLabel.setText("Score: 0");
+        sidePanel.levelLabel.setText("Level: 1");
+        sidePanel.repaintTetris(game.nextBlock);
+        gameArea.repaint(game.block);
+    }
+
 
     public static void main(String[] args){
         Tetris game = new Tetris(20, 10);

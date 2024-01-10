@@ -1,5 +1,4 @@
 class Car{
-    
     private Person owner;
     private Color color;
     private String brand;
@@ -10,7 +9,6 @@ class Car{
     public void fillPetrol(int literPetrol){...}
 
     public void repairEngine(){...}
-    
 }
 
 class Driver extends Person{
@@ -45,7 +43,6 @@ interface ForDriver{
 interface ForMechanic{
     public void repairEngine(Car car);
 }
-
 
 class Driver extends Person implements ForDrive{
     private Car car;

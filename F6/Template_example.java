@@ -3,13 +3,13 @@ abstract class Integrator {
     
     abstract double func(double x);
     
-    void set (double min, double max, double intervall){
+    void set(double min, double max, double intervall){
 		this.min=min;
 		this.max=max;
 		this.intervall=intervall;
     }
 
-    double calcIntegralValue (){
+    double calcIntegralValue(){
 		double sum=0;
 		while(min<=max){
 			sum += func(min); //access function

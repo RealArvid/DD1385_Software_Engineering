@@ -4,6 +4,6 @@ public class MyIterable implements Iterable<Double>{
 
     @Override
     public Iterator<Double> iterator() {
-        return new Fibonacci();
+        return new MyIterator();
     }
 }
