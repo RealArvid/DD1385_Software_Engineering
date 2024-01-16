@@ -1,5 +1,8 @@
 # Excludes all files containing test in its name, in all folders and subfolders
 **/*test*
-# Excludes all files containing an uppercase letter followed by a number, e.g. F5 and Ex1
+# Excludes folders like Ex1
 Ex[0-9]
+# Excludes folders like F1
 F[0-9]
+# Excludes files like F5.pdf
+F[0-9].pdf
