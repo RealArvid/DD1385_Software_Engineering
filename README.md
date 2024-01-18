@@ -19,5 +19,5 @@ As the final project of the course, the game Tetris was implemented according to
 
 The behavior of the game is mostly self-explanatory. For example, the left, right, up and down arrow buttons work just as one would expect. One less obvious detail is that the user can pause and then resume the game by pressing either P or the space button. With each new level, the game becomes more difficult in that the blocks fall faster. This is implemented by reducing the sleep time in the Tetris class, whereas the level the user is at depends on the number of cleared lines.
 
-![SVG Image](Project/UML_Tetris.svg)
+![PNG Image](Project/UML_Tetris.png)
 <img src="Project/Screenshot_Tetris.jpg" alt="Alt text" width="525" height="725">
