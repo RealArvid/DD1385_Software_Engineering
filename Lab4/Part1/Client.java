@@ -1,6 +1,4 @@
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Queue;
 
 public class Client {
     public static void main(String args[]){
@@ -25,7 +23,6 @@ public class Client {
         suitcase.add(computerBag);
         suitcase.add(new Item("Tröja", 0.3));
         suitcase.add(new Item("Skjorta", 0.5));
-
 
 
         int count = 0;
